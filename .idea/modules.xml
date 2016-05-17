@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Kurento_p2p_andorid.iml" filepath="$PROJECT_DIR$/Kurento_p2p_andorid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Kurt_p2p_andorid.iml" filepath="$PROJECT_DIR$/Kurt_p2p_andorid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/kurentrtclib/kurentrtclib.iml" filepath="$PROJECT_DIR$/kurentrtclib/kurentrtclib.iml" />
       <module fileurl="file://$PROJECT_DIR$/simplep2p/simplep2p.iml" filepath="$PROJECT_DIR$/simplep2p/simplep2p.iml" />

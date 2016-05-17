@@ -1,4 +1,4 @@
-/*
+package org.webrtc;/*
  *  Copyright (c) 2015 The WebRTC project authors. All Rights Reserved.
  *
  *  Use of this source code is governed by a BSD-style license
@@ -8,17 +8,15 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package org.webrtc;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.EnumSet;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /** Java wrapper for WebRTC logging. */
 public class Logging {
-  private static final Logger fallbackLogger = Logger.getLogger("org.webrtc.Logging");
+  private static final Logger fallbackLogger = Logger.getLogger("org.webrtc.org.webrtc.Logging");
   private static boolean tracingEnabled;
 
   static {

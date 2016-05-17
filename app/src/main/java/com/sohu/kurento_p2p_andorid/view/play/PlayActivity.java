@@ -30,6 +30,7 @@ import com.sohu.kurento_p2p_andorid.controller.net.P2pSocketResponseEvents;
 import com.sohu.kurento_p2p_andorid.model.bean.BaseP2pSocketResponse;
 
 import org.webrtc.EglBase;
+import org.webrtc.EglBase14;
 import org.webrtc.IceCandidate;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
@@ -190,9 +191,9 @@ public class PlayActivity extends FragmentActivity implements PeerConnectionClie
         remotevideoview.setOnClickListener(listener);
 
         //Create video renders
-        rootEglBase = new EglBase();
-        localvideoview.init(rootEglBase.getContext(), null);
-        remotevideoview.init(rootEglBase.getContext(), null);
+        rootEglBase = new EglBase14((EglBase14.Context) EglBase.create().getEglBaseContext(), EglBase.CONFIG_PIXEL_BUFFER);
+        localvideoview.init(rootEglBase.getEglBaseContext(), null);
+        remotevideoview.init(rootEglBase.getEglBaseContext(), null);
         localvideoview.setZOrderMediaOverlay(true);
         updateVideoView();
 
@@ -208,9 +209,9 @@ public class PlayActivity extends FragmentActivity implements PeerConnectionClie
 
         //TODO getIntent data.
 
-        peerConnectionParameters = new PeerConnectionClient.PeerConnectionParameters(true, false,
-                0, 0, 15, 200, PeerConnectionClient.VIDEO_CODEC_VP8, true, 0, PeerConnectionClient
-                .AUDIO_CODEC_OPUS, false, true);
+        peerConnectionParameters = new PeerConnectionClient.PeerConnectionParameters(true, false, true,
+                650, 480, 15, 128, PeerConnectionClient.VIDEO_CODEC_VP8, true, true, 128, PeerConnectionClient
+                .AUDIO_CODEC_OPUS, false, true, true);
 
         commandLineRun = false;
         runTimeMs = 0;
@@ -346,7 +347,7 @@ public class PlayActivity extends FragmentActivity implements PeerConnectionClie
         Log.d(TAG, "Initializing the audio manager...");
         audioManager.init();
 
-        peerConnectionClient.createPeerConnection(rootEglBase.getContext(), localvideoview,
+        peerConnectionClient.createPeerConnection(rootEglBase.getEglBaseContext(), localvideoview,
                 remotevideoview, getIces());
 
         peerConnectionClient.createOffer();

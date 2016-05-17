@@ -246,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
     private void inComingCall(final String name) {
 
         Dialog dialog = new AlertDialog.Builder(MainActivity.this).setIcon(android.R.drawable.sym_call_incoming)
-                .setTitle(R.string.incoming_call).setPositiveButton(getString(R.string.accept_call), new DialogInterface.OnClickListener() {
+                .setTitle(getString(R.string.incoming_call, name)).setPositiveButton(getString(R.string.accept_call), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
