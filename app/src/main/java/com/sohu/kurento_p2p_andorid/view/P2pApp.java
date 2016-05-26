@@ -26,7 +26,13 @@ public class P2pApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        init();
         wsConnect();
+    }
+
+    private void init(){
+        SharePrefUtil.initPrefSrc(getApplicationContext(), R.xml.preferences);
     }
 
     /**
@@ -35,8 +41,7 @@ public class P2pApp extends Application {
     public void wsConnect() {
 
         P2pSocketClient p2pSocketClient = P2pSocketClient.newInstance();
-        p2pSocketClient.connect(SharePrefUtil.getWebSocketUrl(getApplicationContext(), R.xml
-                .preferences), connectEvents);
+        p2pSocketClient.connect(SharePrefUtil.getWebSocketUrl(), connectEvents);
 
     }
 

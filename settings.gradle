@@ -1,1 +1,1 @@
-include ':app', ':kurentrtclib', ':utillib', ':simplep2p'
+include ':app', ':utillib', ':v50_lib'

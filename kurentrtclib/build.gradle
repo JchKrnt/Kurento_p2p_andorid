@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '23.0.2'
+    buildToolsVersion '24.0.0 rc3'
 
     defaultConfig {
         minSdkVersion 18
@@ -24,7 +24,6 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile files('libs/gson-2.3.1.jar')
     compile files('libs/autobanh.jar')
     compile 'com.android.support:appcompat-v7:23.0.1'

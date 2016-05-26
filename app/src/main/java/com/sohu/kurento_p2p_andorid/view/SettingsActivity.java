@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
@@ -37,7 +38,7 @@ public class SettingsActivity extends AppCompatActivity {
 		FragmentManager fManager = getFragmentManager();
 		FragmentTransaction ft = fManager.beginTransaction();
 		fragmet = new MySettingPreferenceFragmet();
-		FragmentTransaction fragmentTransaction = ft.replace(android.R.id.content, fragmet);
+		ft.replace(android.R.id.content, fragmet);
 		ft.commit();
 
 	}
@@ -58,12 +59,65 @@ public class SettingsActivity extends AppCompatActivity {
 		updateSummary(sharedPreferences, getString(R.string.pref_key_port));
 		updateSummary(sharedPreferences, getString(R.string.pref_key_method));
 		updateSummary(sharedPreferences, getString(R.string.pref_key_stun));
+		updateCheckBoxSummary(sharedPreferences, getString(R.string.pref_key_video_callable));
+		updateSummary(sharedPreferences, getString(R.string.pref_key_video_code));
+		updateSummary(sharedPreferences, getString(R.string.pref_key_video_frame));
+		updateSummary(sharedPreferences, getString(R.string.pref_key_video_resulotion));
+		updateSummary(sharedPreferences, getString(R.string.pref_maxVideoBitrate_key));
+		updateSummaryBitrate(sharedPreferences, getString(R.string.pref_maxVideoBitratevalue_key));
+		updateVideoBitrateEnable(sharedPreferences);
+
+		updateSummary(sharedPreferences, getString(R.string.pref_audiocodec_key));
+		updateSummary(sharedPreferences, getString(R.string.pref_maxAudiobitrate_key));
+		updateSummaryBitrate(sharedPreferences, getString(R.string.pref_maxAudiobitratevalue_key));
+		updateAudioBitratEnable(sharedPreferences);
+		updateCheckBoxSummary(sharedPreferences, getString(R.string.pref_audioprocessing_key));
+
 	}
 
 	private void updateSummary(SharedPreferences sharedPreferences, String key) {
 
 		Preference updatePref = fragmet.findPreference(key);
 		updatePref.setSummary(sharedPreferences.getString(key, ""));
+	}
+
+	private void updateCheckBoxSummary(SharedPreferences sharedPreferences, String key){
+
+		CheckBoxPreference updatePref = (CheckBoxPreference) fragmet.findPreference(key);
+
+		updatePref.setChecked(sharedPreferences.getBoolean(key, true));
+
+	}
+
+	private void updateSummaryBitrate(
+			SharedPreferences sharedPreferences, String key) {
+		Preference updatedPref = fragmet.findPreference(key);
+		updatedPref.setSummary(sharedPreferences.getString(key, "") + " kbps");
+	}
+
+	private void updateVideoBitrateEnable(SharedPreferences sharedPreferences){
+
+		String defaultTypeValue = getString(R.string.pref_maxVideoBitrate_default);
+		String typeValue = sharedPreferences.getString(getString(R.string.pref_maxVideoBitrate_key), defaultTypeValue);
+		Preference bitratePref = fragmet.findPreference(getString(R.string.pref_maxVideoBitratevalue_key));
+
+		if (defaultTypeValue.equals(typeValue)){
+			bitratePref.setEnabled(false);
+		}else {
+			bitratePref.setEnabled(true);
+		}
+	}
+
+	private void updateAudioBitratEnable(SharedPreferences sharedPreferences){
+		String defaultTypeValue = getString(R.string.pref_maxAudiobitrate_default);
+		String typeValue = sharedPreferences.getString(getString(R.string.pref_maxAudiobitrate_key), defaultTypeValue);
+		Preference bitratePref = fragmet.findPreference(getString(R.string.pref_maxAudiobitratevalue_key));
+
+		if (defaultTypeValue.equals(typeValue)){
+			bitratePref.setEnabled(false);
+		}else {
+			bitratePref.setEnabled(true);
+		}
 	}
 
 	@Override
@@ -97,11 +151,29 @@ public class SettingsActivity extends AppCompatActivity {
 			if (key.equals(getString(R.string.pref_key_host)) ||
 					key.equals(getString(R.string.pref_key_port)) ||
 					key.equals(getString(R.string.pref_key_method)) ||
-					key.equals(getString(R.string.pref_key_stun))) {
-
+					key.equals(getString(R.string.pref_key_stun))||
+					key.equals(getString(R.string.pref_key_video_code))||
+					key.equals(getString(R.string.pref_key_video_frame))||
+					key.equals(getString(R.string.pref_key_video_resulotion))||
+					key.equals(getString(R.string.pref_maxVideoBitrate_key))||
+					key.equals(getString(R.string.pref_audiocodec_key))||
+					key.equals(getString(R.string.pref_maxAudiobitrate_key))) {
 				updateSummary(sharedPreferences, key);
+			}else if (key.equals(getString(R.string.pref_key_video_callable)) ||
+					key.equals(getString(R.string.pref_audioprocessing_key))){
+				updateCheckBoxSummary(sharedPreferences, key);
+			}else if (key.equals(getString(R.string.pref_maxVideoBitratevalue_key))||
+					key.equals(getString(R.string.pref_maxAudiobitratevalue_key))){
+				updateSummaryBitrate(sharedPreferences, key);
 			}
 
+			if (key.equals(getString(R.string.pref_maxVideoBitrate_key))){
+				updateVideoBitrateEnable(sharedPreferences);
+			}
+
+			if (key.equals(getString(R.string.pref_maxAudiobitrate_key))){
+				updateAudioBitratEnable(sharedPreferences);
+			}
 		}
 	}
 

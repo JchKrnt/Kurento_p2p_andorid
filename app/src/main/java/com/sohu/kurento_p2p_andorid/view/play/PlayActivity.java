@@ -62,31 +62,48 @@ public class PlayActivity extends FragmentActivity implements PeerConnectionClie
             "org.appsopt.apprtc.VIDEO_CAPTUREQUALITYSLIDER";
     public static final String EXTRA_VIDEO_BITRATE =
             "org.appspot.apprtc.VIDEO_BITRATE";
+    public static final String EXTRA_VIDEO_MAX_BITRATE =
+            "org.appspot.apprtc.VIDEO_MAX_BITRATE";
     public static final String EXTRA_VIDEOCODEC =
             "org.appspot.apprtc.VIDEOCODEC";
     public static final String EXTRA_HWCODEC_ENABLED =
             "org.appspot.apprtc.HWCODEC";
+    public static final String EXTRA_CAPTURETOTEXTURE_ENABLED =
+            "org.appspot.apprtc.CAPTURETOTEXTURE";
+    public static final String EXTRA_AUDIO_MAX_BITRATE =
+            "org.appspot.apprtc.AUDIO_MAX_BITRATE";
     public static final String EXTRA_AUDIO_BITRATE =
             "org.appspot.apprtc.AUDIO_BITRATE";
     public static final String EXTRA_AUDIOCODEC =
             "org.appspot.apprtc.AUDIOCODEC";
     public static final String EXTRA_NOAUDIOPROCESSING_ENABLED =
             "org.appspot.apprtc.NOAUDIOPROCESSING";
+    public static final String EXTRA_AECDUMP_ENABLED =
+            "org.appspot.apprtc.AECDUMP";
+    public static final String EXTRA_OPENSLES_ENABLED =
+            "org.appspot.apprtc.OPENSLES";
     public static final String EXTRA_CPUOVERUSE_DETECTION =
             "org.appspot.apprtc.CPUOVERUSE_DETECTION";
     public static final String EXTRA_DISPLAY_HUD =
             "org.appspot.apprtc.DISPLAY_HUD";
+    public static final String EXTRA_TRACING = "org.appspot.apprtc.TRACING";
     public static final String EXTRA_CMDLINE =
             "org.appspot.apprtc.CMDLINE";
     public static final String EXTRA_RUNTIME =
             "org.appspot.apprtc.RUNTIME";
+    public static final String EXTRA_CALLER = "com.sohu.jch.caller";
+    public static final String EXTRA_CALLEE = "com.sohu.jch.callee";
+    public static final String EXTRA_CALLTYPE = "com.sohu.jch.callType";
+
     private static final String TAG = "CallRTCClient";
+
 
     // List of mandatory application permissions.
     private static final String[] MANDATORY_PERMISSIONS = {
             "android.permission.MODIFY_AUDIO_SETTINGS",
             "android.permission.RECORD_AUDIO",
-            "android.permission.INTERNET"
+            "android.permission.INTERNET",
+            "android.permission.ACCESS_NETWORK_STATE"
     };
 
     // Peer connection statistics callback period in ms.
@@ -191,7 +208,7 @@ public class PlayActivity extends FragmentActivity implements PeerConnectionClie
         remotevideoview.setOnClickListener(listener);
 
         //Create video renders
-        rootEglBase = new EglBase14((EglBase14.Context) EglBase.create().getEglBaseContext(), EglBase.CONFIG_PIXEL_BUFFER);
+        rootEglBase = EglBase.create();
         localvideoview.init(rootEglBase.getEglBaseContext(), null);
         remotevideoview.init(rootEglBase.getEglBaseContext(), null);
         localvideoview.setZOrderMediaOverlay(true);
@@ -209,32 +226,34 @@ public class PlayActivity extends FragmentActivity implements PeerConnectionClie
 
         //TODO getIntent data.
 
-        peerConnectionParameters = new PeerConnectionClient.PeerConnectionParameters(true, false, true,
-                650, 480, 15, 128, PeerConnectionClient.VIDEO_CODEC_VP8, true, true, 128, PeerConnectionClient
-                .AUDIO_CODEC_OPUS, false, true, true);
+        Intent intent = getIntent();
+        peerConnectionParameters = new PeerConnectionClient.PeerConnectionParameters(
+                intent.getBooleanExtra(EXTRA_VIDEO_CALL, true),
+                false, intent.getBooleanExtra(EXTRA_TRACING, false),
+                intent.getIntExtra(EXTRA_VIDEO_WIDTH, 0),
+                intent.getIntExtra(EXTRA_VIDEO_HEIGHT, 0),
+                intent.getIntExtra(EXTRA_VIDEO_FPS, 30),
+                intent.getIntExtra(EXTRA_VIDEO_MAX_BITRATE, 1000) / 2,
+                intent.getIntExtra(EXTRA_VIDEO_MAX_BITRATE, 1000),
+                intent.getStringExtra(EXTRA_VIDEOCODEC),
+                intent.getBooleanExtra(EXTRA_HWCODEC_ENABLED, true),
+                intent.getBooleanExtra(EXTRA_CAPTURETOTEXTURE_ENABLED, false),
+                intent.getIntExtra(EXTRA_AUDIO_MAX_BITRATE, 300) / 2,
+                intent.getIntExtra(EXTRA_AUDIO_MAX_BITRATE, 300),
+                intent.getStringExtra(EXTRA_AUDIOCODEC),
+                intent.getBooleanExtra(EXTRA_NOAUDIOPROCESSING_ENABLED, false),
+                intent.getBooleanExtra(EXTRA_AECDUMP_ENABLED, false),
+                intent.getBooleanExtra(EXTRA_OPENSLES_ENABLED, false));
 
-        commandLineRun = false;
+
+//        peerConnectionParameters = new PeerConnectionClient.PeerConnectionParameters(true, false, true,
+//                650, 480, 15, 128, PeerConnectionClient.VIDEO_CODEC_VP8, true, true, 128, PeerConnectionClient
+//                .AUDIO_CODEC_OPUS, false, true, true);
+
+        commandLineRun = true;
         runTimeMs = 0;
-
-        Intent intent = new Intent();
         //TODO set intent room id.
-        intent.putExtra(EXTRA_LOOPBACK, false);
-        intent.putExtra(EXTRA_VIDEO_CALL, true);
-        intent.putExtra(EXTRA_VIDEO_WIDTH, 0);
-        intent.putExtra(EXTRA_VIDEO_HEIGHT, 0);
-        intent.putExtra(EXTRA_VIDEO_FPS, 30);
-        intent.putExtra(EXTRA_VIDEO_BITRATE, 256);
-        intent.putExtra(EXTRA_VIDEOCODEC, PeerConnectionClient.VIDEO_CODEC_VP8);
-        intent.putExtra(EXTRA_HWCODEC_ENABLED, true);
-        intent.putExtra(EXTRA_AUDIO_BITRATE, 256);
-        intent.putExtra(EXTRA_AUDIOCODEC, PeerConnectionClient.AUDIO_CODEC_OPUS);
-        intent.putExtra(EXTRA_NOAUDIOPROCESSING_ENABLED, false);
-        intent.putExtra(EXTRA_CPUOVERUSE_DETECTION, true);
-        intent.putExtra(EXTRA_CMDLINE, false);
-        intent.putExtra(EXTRA_DISPLAY_HUD, true);
-        intent.putExtra(EXTRA_RUNTIME, 0);
-        intent.putExtra(EXTRA_ROOMID, getIntent().getStringExtra(EXTRA_ROOMID));
-        intent.putExtra(EXTRA_VIDEO_CAPTUREQUALITYSLIDER_ENABLED, true);
+
         // Send intent arguments to fragments.
         playFragment.setArguments(intent.getExtras());
         hudFragment.setArguments(intent.getExtras());
@@ -256,7 +275,7 @@ public class PlayActivity extends FragmentActivity implements PeerConnectionClie
 
         peerConnectionClient = PeerConnectionClient.getInstance();
         PeerConnectionFactory.Options options = new PeerConnectionFactory.Options();
-        options.networkIgnoreMask = PeerConnectionFactory.Options.ADAPTER_TYPE_WIFI;
+        options.networkIgnoreMask = PeerConnectionFactory.Options.ADAPTER_TYPE_UNKNOWN;
         peerConnectionClient.setPeerConnectionFactoryOptions(options);
         peerConnectionClient.createPeerConnectionFactory(
                 PlayActivity.this, peerConnectionParameters, PlayActivity.this);
@@ -439,11 +458,12 @@ public class PlayActivity extends FragmentActivity implements PeerConnectionClie
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                progressDialog.show();
-                if (getIntent().getBooleanExtra("call", true)) {
-                    P2pSocketClient.newInstance().call(getIntent().getStringExtra("caller"), getIntent().getStringExtra("callee"), sdp.description);
+                if (!progressDialog.isShowing())
+                    progressDialog.show();
+                if (getIntent().getBooleanExtra(EXTRA_CALLTYPE, true)) {
+                    P2pSocketClient.newInstance().call(getIntent().getStringExtra(EXTRA_CALLER), getIntent().getStringExtra(EXTRA_CALLEE), sdp.description);
                 } else {
-                    P2pSocketClient.newInstance().inComingCallResponse(getIntent().getStringExtra("caller"), sdp.description, true);
+                    P2pSocketClient.newInstance().inComingCallResponse(getIntent().getStringExtra(EXTRA_CALLER), sdp.description, true);
                 }
             }
         });

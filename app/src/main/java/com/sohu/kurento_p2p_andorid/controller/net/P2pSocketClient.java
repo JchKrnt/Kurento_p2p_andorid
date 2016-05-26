@@ -189,7 +189,7 @@ public class P2pSocketClient implements WebSocketChannel.WebSocketEvents, Closea
             }
 
             case iceCandidate: {
-                LogCat.v("--iceCandidate case--from" + response.getIceCandidate());
+                LogCat.v("--iceCandidate case--from " + response.getIceCandidate().candidate);
                 if (connectEvents != null)
 
                     pSocketEvents.onIceCandidate(response.getIceCandidate());

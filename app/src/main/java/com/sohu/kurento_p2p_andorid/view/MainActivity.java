@@ -29,6 +29,7 @@ import com.sohu.kurento.util.LogCat;
 import com.sohu.kurento_p2p_andorid.R;
 import com.sohu.kurento_p2p_andorid.controller.net.P2pSocketClient;
 import com.sohu.kurento_p2p_andorid.controller.net.UserResponseBean;
+import com.sohu.kurento_p2p_andorid.controller.sharePref.SharePrefUtil;
 import com.sohu.kurento_p2p_andorid.model.bean.UserBean;
 import com.sohu.kurento_p2p_andorid.util.Constants;
 import com.sohu.kurento_p2p_andorid.view.play.PlayActivity;
@@ -137,12 +138,8 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
         @Override
         public void onItemClickListener(UserBean userBean) {
 
-            Intent intent = new Intent(MainActivity.this, PlayActivity.class);
-            intent.putExtra("caller", nametv.getText().toString());
-            intent.putExtra("callee", userBean.getName());
-            intent.putExtra(PlayActivity.EXTRA_ROOMID, nametv.getText().toString());
-            intent.putExtra("call", true);
-            startActivityForResult(intent, P2PPLAY_CODE);
+            gotoPlayActivity(userBean.getName(), nametv.getText().toString().trim(), true);
+
         }
     }
 
@@ -250,12 +247,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        Intent intent = new Intent(MainActivity.this, PlayActivity.class);
-                        intent.putExtra("caller", name);
-                        intent.putExtra("callee", nametv.getText().toString());
-                        intent.putExtra("call", false);
-                        intent.putExtra(PlayActivity.EXTRA_ROOMID, nametv.getText().toString());
-                        startActivityForResult(intent, P2PPLAY_CODE);
+                        gotoPlayActivity(nametv.getText().toString(), name, false);
 
                     }
                 }).setNegativeButton(R.string.reject_call, new DialogInterface.OnClickListener() {
@@ -266,7 +258,31 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                     }
                 }).create();
         dialog.show();
+    }
 
+    private void gotoPlayActivity(String callee, String caller, boolean call){
+
+        Intent intent = new Intent(MainActivity.this, PlayActivity.class);
+        intent.putExtra(PlayActivity.EXTRA_VIDEO_CALL, SharePrefUtil.getVedioAble());
+        intent.putExtra(PlayActivity.EXTRA_TRACING, true);
+        intent.putExtra(PlayActivity.EXTRA_VIDEO_WIDTH, SharePrefUtil.getVideoResolution().x);
+        intent.putExtra(PlayActivity.EXTRA_VIDEO_HEIGHT, SharePrefUtil.getVideoResolution().y);
+        intent.putExtra(PlayActivity.EXTRA_VIDEO_FPS, SharePrefUtil.getVideoFps());
+        intent.putExtra(PlayActivity.EXTRA_VIDEO_BITRATE, SharePrefUtil.getVideoMaxBitrate());
+        intent.putExtra(PlayActivity.EXTRA_VIDEO_MAX_BITRATE, SharePrefUtil.getVideoMaxBitrate());
+        intent.putExtra(PlayActivity.EXTRA_VIDEOCODEC, SharePrefUtil.getVideoCodeType().toString());
+        intent.putExtra(PlayActivity.EXTRA_HWCODEC_ENABLED, true);
+        intent.putExtra(PlayActivity.EXTRA_CAPTURETOTEXTURE_ENABLED, true);
+        intent.putExtra(PlayActivity.EXTRA_AUDIOCODEC, SharePrefUtil.getAudioCodeType().toString());
+        intent.putExtra(PlayActivity.EXTRA_AUDIO_MAX_BITRATE, SharePrefUtil.getAudioMaxBitrate());
+        intent.putExtra(PlayActivity.EXTRA_NOAUDIOPROCESSING_ENABLED, true);
+        intent.putExtra(PlayActivity.EXTRA_AECDUMP_ENABLED, false);
+        intent.putExtra(PlayActivity.EXTRA_OPENSLES_ENABLED, true);
+        intent.putExtra(PlayActivity.EXTRA_CALLER, caller);
+        intent.putExtra(PlayActivity.EXTRA_CALLEE, callee);
+        intent.putExtra(PlayActivity.EXTRA_CALLTYPE, call);
+        intent.putExtra(PlayActivity.EXTRA_ROOMID, nametv.getText().toString());
+        startActivityForResult(intent, P2PPLAY_CODE);
     }
 
 

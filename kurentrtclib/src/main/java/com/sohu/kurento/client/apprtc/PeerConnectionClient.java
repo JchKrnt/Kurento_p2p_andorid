@@ -72,6 +72,9 @@ public class PeerConnectionClient {
     public static final String AUDIO_CODEC_ISAC = "ISAC";
     private static final String VIDEO_CODEC_PARAM_START_BITRATE =
             "x-google-start-bitrate";
+    private static final String VIDEO_CODE_PAEAM_MAX_BITRATE = "x-google-max-bitrate";
+    private static final String VIDEO_CODE_PAEAM_MIN_BITRATE = "x-google-min-bitrate";
+    private static final String VIDEO_CODE_PAEAM_MAX_QUANTIZATION_BITRATE = "x-google-max-quantization";
     private static final String AUDIO_CODEC_PARAM_BITRATE = "maxaveragebitrate";
     private static final String AUDIO_ECHO_CANCELLATION_CONSTRAINT = "googEchoCancellation";
     private static final String AUDIO_AUTO_GAIN_CONTROL_CONSTRAINT = "googAutoGainControl";
@@ -140,10 +143,12 @@ public class PeerConnectionClient {
         public final int videoHeight;
         public final int videoFps;
         public final int videoStartBitrate;
+        public final int maxVideoBitrate;
         public final String videoCodec;
         public final boolean videoCodecHwAcceleration;
         public final boolean captureToTexture;
         public final int audioStartBitrate;
+        public final int maxAudioBitrate;
         public final String audioCodec;
         public final boolean noAudioProcessing;
         public final boolean aecDump;
@@ -151,9 +156,9 @@ public class PeerConnectionClient {
 
         public PeerConnectionParameters(
                 boolean videoCallEnabled, boolean loopback,boolean tracing,
-                int videoWidth, int videoHeight, int videoFps, int videoStartBitrate,
+                int videoWidth, int videoHeight, int videoFps, int videoStartBitrate,int maxVideoBitrate,
                 String videoCodec, boolean videoCodecHwAcceleration, boolean captureToTexture,
-                int audioStartBitrate, String audioCodec,
+                int audioStartBitrate, int maxAudioBitrate, String audioCodec,
                 boolean noAudioProcessing, boolean aecDump, boolean useOpenSLES) {
             this.videoCallEnabled = videoCallEnabled;
             this.loopback = loopback;
@@ -162,10 +167,12 @@ public class PeerConnectionClient {
             this.videoHeight = videoHeight;
             this.videoFps = videoFps;
             this.videoStartBitrate = videoStartBitrate;
+            this.maxVideoBitrate = maxVideoBitrate;
             this.videoCodec = videoCodec;
             this.videoCodecHwAcceleration = videoCodecHwAcceleration;
             this.captureToTexture = captureToTexture;
             this.audioStartBitrate = audioStartBitrate;
+            this.maxAudioBitrate = maxAudioBitrate;
             this.audioCodec = audioCodec;
             this.noAudioProcessing = noAudioProcessing;
             this.aecDump = aecDump;
@@ -174,10 +181,22 @@ public class PeerConnectionClient {
         }
     }
 
+    public enum VideoCodeType {
+        VP8, VP9, H263 ,H264
+    }
+
+    public enum AudioCodeType {
+        opus, ISAC
+    }
+
+    public static enum ConnectionType {
+        READ_ONLY, SEND_ONLY, BOTH_WAY
+    }
+
     /**
      * Peer connection events.
      */
-    public static interface PeerConnectionEvents {
+    public interface PeerConnectionEvents {
         /**
          * Callback fired once local SDP is created and set.
          */
@@ -699,16 +718,18 @@ public class PeerConnectionClient {
                     sdpDescription = preferCodec(sdpDescription, preferredVideoCodec, false);
                 }
                 if (videoCallEnabled && peerConnectionParameters.videoStartBitrate > 0) {
-                    sdpDescription = setStartBitrate(VIDEO_CODEC_VP8, true,
-                            sdpDescription, peerConnectionParameters.videoStartBitrate);
-                    sdpDescription = setStartBitrate(VIDEO_CODEC_VP9, true,
-                            sdpDescription, peerConnectionParameters.videoStartBitrate);
-                    sdpDescription = setStartBitrate(VIDEO_CODEC_H264, true,
-                            sdpDescription, peerConnectionParameters.videoStartBitrate);
+                    sdpDescription = setBitrate(VIDEO_CODEC_VP8, true,
+                            sdpDescription, peerConnectionParameters.videoStartBitrate, peerConnectionParameters.maxVideoBitrate);
+                    sdpDescription = setBitrate(VIDEO_CODEC_VP9, true,
+                            sdpDescription, peerConnectionParameters.videoStartBitrate, peerConnectionParameters.maxVideoBitrate);
+                    sdpDescription = setBitrate(VIDEO_CODEC_H264, true,
+                            sdpDescription, peerConnectionParameters.videoStartBitrate, peerConnectionParameters.maxVideoBitrate);
+
+                    sdpDescription = setVideoBandwidth(sdpDescription, peerConnectionParameters.maxVideoBitrate);
                 }
                 if (peerConnectionParameters.audioStartBitrate > 0) {
-                    sdpDescription = setStartBitrate(AUDIO_CODEC_OPUS, false,
-                            sdpDescription, peerConnectionParameters.audioStartBitrate);
+                    sdpDescription = setBitrate(AUDIO_CODEC_OPUS, false,
+                            sdpDescription, peerConnectionParameters.audioStartBitrate, peerConnectionParameters.maxAudioBitrate);
                 }
                 Log.d(TAG, "Set remote SDP.");
                 SessionDescription sdpRemote = new SessionDescription(
@@ -766,6 +787,127 @@ public class PeerConnectionClient {
         return localVideoTrack;
     }
 
+    private static String setBitrate(String codec, boolean isVideoCodec,
+                                     String sdpDescription, int startBitrateKbps, int maxBitrateKbps) {
+
+        LogCat.debug("before start bitrate :-- " + sdpDescription);
+        String[] lines = sdpDescription.split("\r\n");
+        int rtpmapLineIndex = -1;
+        boolean sdpFormatUpdated = false;
+        String codecRtpMap = null;
+        // Search for codec rtpmap in format
+        // a=rtpmap:<payload type> <encoding name>/<clock rate> [/<encoding parameters>]
+        String regex = "^a=rtpmap:(\\d+) " + codec + "(/\\d+)+[\r]?$";
+        Pattern codecPattern = Pattern.compile(regex);
+        for (int i = 0; i < lines.length; i++) {
+            Matcher codecMatcher = codecPattern.matcher(lines[i]);
+            if (codecMatcher.matches()) {
+                codecRtpMap = codecMatcher.group(1);
+                rtpmapLineIndex = i;
+                break;
+            }
+        }
+        if (codecRtpMap == null) {
+            Log.w(TAG, "No rtpmap for " + codec + " codec");
+            return sdpDescription;
+        }
+        LogCat.debug("Found " + codec + " rtpmap " + codecRtpMap
+                + " at " + lines[rtpmapLineIndex]);
+
+        //sdp.replace(/a=mid:video\r\n/g, 'a=mid:video\r\nb=AS:' + videoBandwidth + '\r\n')
+
+        // Check if a=fmtp string already exist in remote SDP for this codec and
+        // update it with new bitrate parameter.
+        regex = "^a=fmtp:" + codecRtpMap + " \\w+=\\d+.*[\r]?$";
+        codecPattern = Pattern.compile(regex);
+        for (int i = 0; i < lines.length; i++) {
+            Matcher codecMatcher = codecPattern.matcher(lines[i]);
+            if (codecMatcher.matches()) {
+                LogCat.debug("Found " + codec + " " + lines[i]);
+                if (isVideoCodec) {
+                    lines[i] += "; " + VIDEO_CODEC_PARAM_START_BITRATE
+                            + "=" + startBitrateKbps;
+                    lines[i] += "; " + VIDEO_CODE_PAEAM_MAX_BITRATE
+                            + "=" + maxBitrateKbps;
+                    lines[i] += "; " + VIDEO_CODE_PAEAM_MIN_BITRATE
+                            + "=" + maxBitrateKbps/10;
+                    lines[i] += "; " + VIDEO_CODE_PAEAM_MAX_QUANTIZATION_BITRATE
+                            + "=" + 25;
+                } else {
+                    lines[i] += "; " + AUDIO_CODEC_PARAM_BITRATE
+                            + "=" + (maxBitrateKbps * 1000);
+                }
+                LogCat.debug("Update remote SDP line: " + lines[i]);
+                sdpFormatUpdated = true;
+                break;
+            }
+        }
+
+        StringBuilder newSdpDescription = new StringBuilder();
+        for (int i = 0; i < lines.length; i++) {
+            newSdpDescription.append(lines[i]).append("\r\n");
+            // Append new a=fmtp line if no such line exist for a codec.
+            if (!sdpFormatUpdated && i == rtpmapLineIndex) {
+                String bitrateSet;
+                if (isVideoCodec) {
+                    bitrateSet = "a=fmtp:" + codecRtpMap + " "
+                            + VIDEO_CODEC_PARAM_START_BITRATE + "=" + startBitrateKbps
+                            + "; " + VIDEO_CODE_PAEAM_MAX_BITRATE + "=" + maxBitrateKbps
+                            + "; " + VIDEO_CODE_PAEAM_MIN_BITRATE + "=" + maxBitrateKbps/10
+                            + "; " + VIDEO_CODE_PAEAM_MAX_QUANTIZATION_BITRATE + "=" + 25;
+                } else {
+                    bitrateSet = "a=fmtp:" + codecRtpMap + " "
+                            + AUDIO_CODEC_PARAM_BITRATE + "=" + (startBitrateKbps * 1000);
+                }
+                LogCat.debug("Add remote SDP line: " + bitrateSet);
+                newSdpDescription.append(bitrateSet).append("\r\n");
+            }
+
+        }
+
+        LogCat.debug("after set bitrate :-- " + newSdpDescription);
+        return newSdpDescription.toString();
+    }
+
+    /**
+     *
+     * @param sdp
+     * @param videoBandwidth
+     * @return
+     */
+    private static String setVideoBandwidth(String sdp, int videoBandwidth){
+
+        String[] lines = sdp.split("\r\n");
+        String regex = "^a=mid:video*[\r]?$";
+        Pattern pattern = Pattern.compile(regex);
+        int i = 0;
+        for (; i < lines.length; i++){
+            Matcher matcher = pattern.matcher(lines[i]);
+            if (matcher.matches()){
+
+                LogCat.debug("Found " + pattern.pattern() +" on " + lines[i]);
+                break;
+
+            }
+
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (int y = 0; y < lines.length; y++){
+            sb.append(lines[y]).append("\r\n");
+            if (y == i){
+                String ab = "b=AS:" + videoBandwidth;
+                sb.append(ab).append("\r\n");
+            }
+
+        }
+
+
+        LogCat.debug("after set videoWidth : " + sb.toString());
+        return sb.toString();
+
+
+    }
     private static String setStartBitrate(String codec, boolean isVideoCodec,
                                           String sdpDescription, int bitrateKbps) {
         String[] lines = sdpDescription.split("\r\n");
@@ -971,6 +1113,8 @@ public class PeerConnectionClient {
                         events.onIceDisconnected();
                     } else if (newState == IceConnectionState.FAILED) {
                         reportError("ICE connection failed.");
+                    } else if (newState == IceConnectionState.CLOSED){
+                        reportError("ICE connection closed.");
                     }
                 }
             });
@@ -1047,6 +1191,14 @@ public class PeerConnectionClient {
             if (videoCallEnabled) {
                 sdpDescription = preferCodec(sdpDescription, preferredVideoCodec, false);
             }
+
+            sdpDescription =setBitrate(VIDEO_CODEC_VP8, true, sdpDescription, peerConnectionParameters.videoStartBitrate, peerConnectionParameters.maxVideoBitrate);
+            sdpDescription =setBitrate(VIDEO_CODEC_VP9, true, sdpDescription, peerConnectionParameters.videoStartBitrate, peerConnectionParameters.maxVideoBitrate);
+            sdpDescription =setBitrate(VIDEO_CODEC_H264, true, sdpDescription, peerConnectionParameters.videoStartBitrate, peerConnectionParameters.maxVideoBitrate);
+            sdpDescription = setVideoBandwidth(sdpDescription, peerConnectionParameters.maxVideoBitrate);
+
+            sdpDescription = setBitrate(peerConnectionParameters.audioCodec, false, sdpDescription, peerConnectionParameters.audioStartBitrate, peerConnectionParameters.maxAudioBitrate);
+
             final SessionDescription sdp = new SessionDescription(
                     origSdp.type, sdpDescription);
             localSdp = sdp;
@@ -1074,12 +1226,12 @@ public class PeerConnectionClient {
                         // local SDP, then after receiving answer set remote SDP.
                         if (peerConnection.getRemoteDescription() == null) {
                             // We've just set our local SDP so time to send it.
-                            Log.d(TAG, "Local SDP set succesfully");
+                            Log.d(TAG, "Local SDP set successfully");
                             events.onLocalDescription(localSdp);
                         } else {
                             // We've just set remote description, so drain remote
                             // and send local ICE candidates.
-                            Log.d(TAG, "Remote SDP set succesfully");
+                            Log.d(TAG, "Remote SDP set successfully");
                             drainCandidates();
                         }
                     } else {
@@ -1088,7 +1240,7 @@ public class PeerConnectionClient {
                         if (peerConnection.getLocalDescription() != null) {
                             // We've just set our local SDP so time to send it, drain
                             // remote and send local ICE candidates.
-                            Log.d(TAG, "Local SDP set succesfully");
+                            Log.d(TAG, "Local SDP set successfully on not initiator");
                             events.onLocalDescription(localSdp);
                             drainCandidates();
                         } else {

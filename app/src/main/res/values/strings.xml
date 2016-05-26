@@ -66,4 +66,59 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="title_activity_play">PlayActivity</string>
+
+    <string name="pref_key_video_settings">video_settings</string>
+    <string name="pref_title_video_settings">Video Settings</string>
+
+    <string name="pref_key_video_callable">videoCallAble</string>
+    <string name="pref_title_video_callable">VideoCallAble</string>
+
+    <string name="pref_key_video_code">Video Code</string>
+    <string name="pref_title_video_code">Video Code</string>
+    <string name="pref_default_video_code">VP8</string>
+    <string name="pref_list_title_video_code">Video Code</string>
+
+    <string name="pref_key_video_frame">Video Frame</string>
+    <string name="pref_title_video_frame">Video Frame</string>
+    <string name="pref_default_video_frame">default</string>
+    <string name="pref_list_title_video_frame">Video Frame</string>
+
+
+    <string name="pref_key_video_resulotion">Video Resolution</string>
+    <string name="pref_title_video_resolution">Video Resolution</string>
+    <string name="pref_default_video_resolution_value">640 x 480</string>
+    <string name="pref__list_title_video_resolution">Video Resolution</string>
+
+    <string name="pref_maxVideoBitrate_key">maxVideoBitrate_preference</string>
+    <string name="pref_maxVideoBitrate_title">maxVideo bitrate setting.</string>
+    <string name="pref_maxVideoBitrate_dlg">max Video bitrate setting.</string>
+    <string name="pref_maxVideoBitrate_default">Default</string>
+
+    <string name="pref_maxVideoBitratevalue_key">maxVideoBitratevalue_preference</string>
+    <string name="pref_maxVideoBitratevalue_title">Video codec bitrate.</string>
+    <string name="pref_maxVideoBitratevalue_dlg">Enter Video codec bitrate in kbps.</string>
+    <string name="pref_maxVideoBitratevalue_default">1000</string>
+
+    <string name="pref_audio_setting">Audio Setting</string>
+
+    <string name="pref_maxAudiobitrate_key">maxAudiobitrate_preference</string>
+    <string name="pref_MaxAudiobitrate_title">Audio bitrate setting.</string>
+    <string name="pref_maxAudiobitrate_dlg">Audio bitrate setting.</string>
+    <string name="pref_maxAudiobitrate_default">Default</string>
+
+    <string name="pref_maxAudiobitratevalue_key">maxAudiobitratevalue_preference</string>
+    <string name="pref_maxAudiobitratevalue_title">Audio codec bitrate.</string>
+    <string name="pref_maxAudiobitratevalue_dlg">Enter audio codec bitrate in kbps.</string>
+    <string name="pref_maxAudiobitratevalue_default">32</string>
+
+    <string name="pref_audiocodec_key">audiocodec_preference</string>
+    <string name="pref_audiocodec_title">Default audio codec.</string>
+    <string name="pref_audiocodec_dlg">Select default audio codec.</string>
+    <string name="pref_audiocodec_default">opus</string>
+
+    <string name="pref_audioprocessing_key">audioprocessing_preference</string>
+    <string name="pref_audioprocessing_title">Disable audio processing.</string>
+    <string name="pref_audioprocessing_dlg">Disable audio processing pipeline.</string>
+    <string name="pref_audioprocessing_default">false</string>
+
 </resources>

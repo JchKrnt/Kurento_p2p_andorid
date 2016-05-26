@@ -190,9 +190,9 @@ public class PlayActivity extends FragmentActivity implements PeerConnectionClie
         remotevideoview.setOnClickListener(listener);
 
         //Create video renders
-        rootEglBase = new EglBase();
-        localvideoview.init(rootEglBase.getContext(), null);
-        remotevideoview.init(rootEglBase.getContext(), null);
+        rootEglBase = EglBase.create();
+        localvideoview.init(rootEglBase.getEglBaseContext(), null);
+        remotevideoview.init(rootEglBase.getEglBaseContext(), null);
         localvideoview.setZOrderMediaOverlay(true);
         updateVideoView();
 

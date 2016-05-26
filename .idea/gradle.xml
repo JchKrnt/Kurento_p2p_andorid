@@ -11,18 +11,16 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/kurentrtclib" />
-            <option value="$PROJECT_DIR$/simplep2p" />
             <option value="$PROJECT_DIR$/utillib" />
+            <option value="$PROJECT_DIR$/v50_lib" />
           </set>
         </option>
         <option name="myModules">
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/kurentrtclib" />
-            <option value="$PROJECT_DIR$/simplep2p" />
             <option value="$PROJECT_DIR$/utillib" />
+            <option value="$PROJECT_DIR$/v50_lib" />
           </set>
         </option>
       </GradleProjectSettings>

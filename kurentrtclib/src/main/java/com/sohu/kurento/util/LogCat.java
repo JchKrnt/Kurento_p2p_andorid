@@ -7,7 +7,7 @@ import android.util.Log;
  */
 public class LogCat {
 
-    private static boolean releaseAble = true;
+    private static boolean releaseAble = false;
 
     private static final String TAG = "SOHU_LIVE";
 

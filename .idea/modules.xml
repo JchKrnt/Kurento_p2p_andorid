@@ -4,9 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Kurt_p2p_andorid.iml" filepath="$PROJECT_DIR$/Kurt_p2p_andorid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/kurentrtclib/kurentrtclib.iml" filepath="$PROJECT_DIR$/kurentrtclib/kurentrtclib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/simplep2p/simplep2p.iml" filepath="$PROJECT_DIR$/simplep2p/simplep2p.iml" />
       <module fileurl="file://$PROJECT_DIR$/utillib/utillib.iml" filepath="$PROJECT_DIR$/utillib/utillib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/v50_lib/v50_lib.iml" filepath="$PROJECT_DIR$/v50_lib/v50_lib.iml" />
     </modules>
   </component>
 </project>
