@@ -26,7 +26,9 @@ import java.util.List;
 public class CaptureQualityController implements SeekBar.OnSeekBarChangeListener {
   private final List<CaptureFormat> formats = Arrays.asList(
       new CaptureFormat(1280, 720, 0, 30000),
+          new CaptureFormat(960, 540, 0, 30000),
       new CaptureFormat(640, 480, 0, 30000),
+      new CaptureFormat(480, 360, 0 , 30000),
       new CaptureFormat(320, 240, 0, 30000),
       new CaptureFormat(256, 144, 0, 30000));
   // Prioritize framerate below this threshold and resolution above the threshold.
@@ -75,7 +77,7 @@ public class CaptureQualityController implements SeekBar.OnSeekBarChangeListener
     long maxCaptureBandwidth = Long.MIN_VALUE;
     for (CaptureFormat format : formats) {
       maxCaptureBandwidth = Math.max(maxCaptureBandwidth,
-          (long) format.width * format.height * format.maxFramerate);
+          (long) format.width * format.height * format.framerate.max);
     }
 
     // Fraction between 0 and 1.
@@ -105,7 +107,7 @@ public class CaptureQualityController implements SeekBar.OnSeekBarChangeListener
 
   // Return the highest frame rate possible based on bandwidth and format.
   private int calculateFramerate(double bandwidth, CaptureFormat format) {
-    return (int) Math.round(Math.min(format.maxFramerate,
+    return (int) Math.round(Math.min(format.framerate.max,
         (int) Math.round(bandwidth / (format.width * format.height))) / 1000.0);
   }
 }

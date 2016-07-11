@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -16,13 +15,8 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.sohu.kurento.bean.RoomBean;
-import com.sohu.kurento.bean.SettingsBean;
-import com.sohu.kurento.bean.UserType;
 import com.sohu.kurento.client.AppRTCAudioManager;
-import com.sohu.kurento.client.KWRtcSession;
 import com.sohu.kurento.client.apprtc.PeerConnectionClient;
-import com.sohu.kurento.netClient.KWEvent;
 import com.sohu.kurento.util.LogCat;
 import com.sohu.kurento_p2p_andorid.R;
 import com.sohu.kurento_p2p_andorid.controller.net.P2pSocketClient;
@@ -30,7 +24,6 @@ import com.sohu.kurento_p2p_andorid.controller.net.P2pSocketResponseEvents;
 import com.sohu.kurento_p2p_andorid.model.bean.BaseP2pSocketResponse;
 
 import org.webrtc.EglBase;
-import org.webrtc.EglBase14;
 import org.webrtc.IceCandidate;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
@@ -38,9 +31,7 @@ import org.webrtc.RendererCommon;
 import org.webrtc.SessionDescription;
 import org.webrtc.StatsReport;
 import org.webrtc.SurfaceViewRenderer;
-import org.webrtc.VideoRendererGui;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,7 +87,6 @@ public class PlayActivity extends FragmentActivity implements PeerConnectionClie
     public static final String EXTRA_CALLTYPE = "com.sohu.jch.callType";
 
     private static final String TAG = "CallRTCClient";
-
 
     // List of mandatory application permissions.
     private static final String[] MANDATORY_PERMISSIONS = {
@@ -243,7 +233,7 @@ public class PlayActivity extends FragmentActivity implements PeerConnectionClie
                 intent.getStringExtra(EXTRA_AUDIOCODEC),
                 intent.getBooleanExtra(EXTRA_NOAUDIOPROCESSING_ENABLED, false),
                 intent.getBooleanExtra(EXTRA_AECDUMP_ENABLED, false),
-                intent.getBooleanExtra(EXTRA_OPENSLES_ENABLED, false));
+                intent.getBooleanExtra(EXTRA_OPENSLES_ENABLED, false), false);
 
 
 //        peerConnectionParameters = new PeerConnectionClient.PeerConnectionParameters(true, false, true,
@@ -285,12 +275,6 @@ public class PlayActivity extends FragmentActivity implements PeerConnectionClie
 
     private List<PeerConnection.IceServer> getIces() {
         String[] stunAddresses = new String[]{
-//                "220.181.90.108:3478",
-//                "61.135.176.88:3478",
-//                "220.181.90.110:3478",
-//                "220.181.90.108:3479",
-//                "61.135.176.88:3479",
-//                "220.181.90.108:3478"
 
         };
 
@@ -394,10 +378,7 @@ public class PlayActivity extends FragmentActivity implements PeerConnectionClie
             remotevideoview.release();
             remotevideoview = null;
         }
-        if (audioManager != null) {
-            audioManager.close();
-            audioManager = null;
-        }
+
         if (iceConnected && !isError) {
             setResult(RESULT_OK);
         } else {
@@ -528,6 +509,7 @@ public class PlayActivity extends FragmentActivity implements PeerConnectionClie
             public void run() {
                 if (!isError && iceConnected) {
                     hudFragment.updateEncoderStatistics(reports);
+
                 }
             }
         });
@@ -623,6 +605,10 @@ public class PlayActivity extends FragmentActivity implements PeerConnectionClie
 
     @Override
     protected void onDestroy() {
+        if (audioManager != null) {
+            audioManager.close();
+            audioManager = null;
+        }
         P2pSocketClient.newInstance().setpSocketEvents(null);
         super.onDestroy();
     }

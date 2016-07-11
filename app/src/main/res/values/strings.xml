@@ -35,12 +35,12 @@
     <string name="pref_title_miscellaneous">Miscellaneous Settings</string>
 
     <string name="pref_key_host">host</string>
-    <string name="pref_default_host">ws://10.2.154.71</string>
+    <string name="pref_default_host">ws://10.10.52.84</string>
     <string name="pref_title_host">WebSokcet Host</string>
     <string name="pref_title_host_dialog">Enter the host url.</string>
 
     <string name="pref_key_port">host_port</string>
-    <string name="pref_default_port">8080</string>
+    <string name="pref_default_port">8443</string>
     <string name="pref_title_port">WebSocket port</string>
     <string name="pref_title_port_dialog">Enter the webSocket url port</string>
 

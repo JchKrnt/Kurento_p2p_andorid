@@ -146,7 +146,7 @@ class SurfaceTextureHelper {
 
     private int texMatrixLoc;
     private int xUnitLoc;
-    private int coeffsLoc;;
+    private int coeffsLoc;
 
     YuvConverter (EglBase.Context sharedContext) {
       eglBase = EglBase.create(sharedContext, EglBase.CONFIG_PIXEL_RGBA_BUFFER);

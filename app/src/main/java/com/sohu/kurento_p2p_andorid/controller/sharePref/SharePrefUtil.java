@@ -65,6 +65,9 @@ public class SharePrefUtil {
 
         String defaultSize = context.getString(R.string.pref_default_video_resolution_value);
         String videoSizeStr = preferences.getString(context.getString(R.string.pref_key_video_resulotion),defaultSize);
+        if (videoSizeStr.equals("Default")){
+            videoSizeStr = defaultSize;
+        }
 
         String[] videoSizeAry = videoSizeStr.split("\\s*x\\s*");
 

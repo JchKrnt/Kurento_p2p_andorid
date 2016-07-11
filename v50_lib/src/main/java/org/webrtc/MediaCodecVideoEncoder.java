@@ -21,8 +21,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Surface;
 
-import org.webrtc.Logging;
-
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashSet;

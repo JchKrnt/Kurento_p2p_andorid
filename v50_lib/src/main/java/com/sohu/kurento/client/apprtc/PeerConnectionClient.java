@@ -472,13 +472,13 @@ public class PeerConnectionClient {
         if (peerConnectionParameters.noAudioProcessing) {
             Log.d(TAG, "Disabling audio processing");
             audioConstraints.mandatory.add(new KeyValuePair(
-                    AUDIO_ECHO_CANCELLATION_CONSTRAINT, "false"));
+                    AUDIO_ECHO_CANCELLATION_CONSTRAINT, "true"));
             audioConstraints.mandatory.add(new KeyValuePair(
-                    AUDIO_AUTO_GAIN_CONTROL_CONSTRAINT, "false"));
+                    AUDIO_AUTO_GAIN_CONTROL_CONSTRAINT, "true"));
             audioConstraints.mandatory.add(new KeyValuePair(
-                    AUDIO_HIGH_PASS_FILTER_CONSTRAINT, "false"));
+                    AUDIO_HIGH_PASS_FILTER_CONSTRAINT, "true"));
             audioConstraints.mandatory.add(new KeyValuePair(
-                    AUDIO_NOISE_SUPPRESSION_CONSTRAINT, "false"));
+                    AUDIO_NOISE_SUPPRESSION_CONSTRAINT, "true"));
         }
         // Create SDP constraints.
         sdpMediaConstraints = new MediaConstraints();
@@ -498,14 +498,10 @@ public class PeerConnectionClient {
             Log.e(TAG, "Peerconnection factory is not created");
             return;
         }
-        Log.d(TAG, "Create peer connection.");
-
         LogCat.debug(ICE_TAG, "Create peer connection.");
 
         Log.d(TAG, "PCConstraints: " + pcConstraints.toString());
-        if (videoConstraints != null) {
-            Log.d(TAG, "VideoConstraints: " + videoConstraints.toString());
-        }
+
         queuedRemoteCandidates = new LinkedList<IceCandidate>();
 
         if (videoCallEnabled) {
@@ -693,7 +689,6 @@ public class PeerConnectionClient {
                 if (peerConnection != null && !isError) {
                     Log.d(TAG, "PC Create OFFER");
                     isInitiator = true;
-                    LogCat.debug(ICE_TAG, "create offer ");
                     peerConnection.createOffer(sdpObserver, sdpMediaConstraints);
                 }
             }
@@ -721,7 +716,6 @@ public class PeerConnectionClient {
                     if (queuedRemoteCandidates != null) {
                         queuedRemoteCandidates.add(candidate);
                     } else {
-
                         LogCat.debug(ICE_TAG, "add remote ice : " + candidate.sdp);
                         peerConnection.addIceCandidate(candidate);
                     }
@@ -744,32 +738,21 @@ public class PeerConnectionClient {
                 if (videoCallEnabled) {
                     sdpDescription = preferCodec(sdpDescription, preferredVideoCodec, false);
                 }
-//                if (videoCallEnabled && peerConnectionParameters.videoStartBitrate > 0) {
-//                    sdpDescription = setBitrate(VIDEO_CODEC_VP8, true,
-//                            sdpDescription, peerConnectionParameters.videoStartBitrate, peerConnectionParameters.maxVideoBitrate);
-//                    sdpDescription = setBitrate(VIDEO_CODEC_VP9, true,
-//                            sdpDescription, peerConnectionParameters.videoStartBitrate, peerConnectionParameters.maxVideoBitrate);
-//                    sdpDescription = setBitrate(VIDEO_CODEC_H264, true,
-//                            sdpDescription, peerConnectionParameters.videoStartBitrate, peerConnectionParameters.maxVideoBitrate);
-//
-//                    sdpDescription = setVideoBandwidth(sdpDescription, peerConnectionParameters.maxVideoBitrate);
-//                }
-//                if (peerConnectionParameters.audioStartBitrate > 0) {
-//                    sdpDescription = setBitrate(AUDIO_CODEC_OPUS, false,
-//                            sdpDescription, peerConnectionParameters.audioStartBitrate, peerConnectionParameters.maxAudioBitrate);
-//                }
                 if (videoCallEnabled && peerConnectionParameters.videoStartBitrate > 0) {
-                    sdpDescription = setStartBitrate(VIDEO_CODEC_VP8, true,
-                            sdpDescription, peerConnectionParameters.videoStartBitrate);
-                    sdpDescription = setStartBitrate(VIDEO_CODEC_VP9, true,
-                            sdpDescription, peerConnectionParameters.videoStartBitrate);
-                    sdpDescription = setStartBitrate(VIDEO_CODEC_H264, true,
-                            sdpDescription, peerConnectionParameters.videoStartBitrate);
+                    sdpDescription = setBitrate(VIDEO_CODEC_VP8, true,
+                            sdpDescription, peerConnectionParameters.videoStartBitrate, peerConnectionParameters.maxVideoBitrate);
+                    sdpDescription = setBitrate(VIDEO_CODEC_VP9, true,
+                            sdpDescription, peerConnectionParameters.videoStartBitrate, peerConnectionParameters.maxVideoBitrate);
+                    sdpDescription = setBitrate(VIDEO_CODEC_H264, true,
+                            sdpDescription, peerConnectionParameters.videoStartBitrate, peerConnectionParameters.maxVideoBitrate);
+
+                    sdpDescription = setVideoBandwidth(sdpDescription, peerConnectionParameters.maxVideoBitrate);
                 }
                 if (peerConnectionParameters.audioStartBitrate > 0) {
-                    sdpDescription = setStartBitrate(AUDIO_CODEC_OPUS, false,
-                            sdpDescription, peerConnectionParameters.audioStartBitrate);
+                    sdpDescription = setBitrate(AUDIO_CODEC_OPUS, false,
+                            sdpDescription, peerConnectionParameters.audioStartBitrate, peerConnectionParameters.maxAudioBitrate);
                 }
+
                 Log.d(TAG, "Set remote SDP.");
                 LogCat.debug(ICE_TAG, "setRemoteDescription : " + sdpDescription);
                 SessionDescription sdpRemote = new SessionDescription(
@@ -1234,14 +1217,12 @@ public class PeerConnectionClient {
                 sdpDescription = preferCodec(sdpDescription, preferredVideoCodec, false);
             }
 
-//            sdpDescription =setBitrate(VIDEO_CODEC_VP8, true, sdpDescription, peerConnectionParameters.videoStartBitrate, peerConnectionParameters.maxVideoBitrate);
-//            sdpDescription =setBitrate(VIDEO_CODEC_VP9, true, sdpDescription, peerConnectionParameters.videoStartBitrate, peerConnectionParameters.maxVideoBitrate);
-//            sdpDescription =setBitrate(VIDEO_CODEC_H264, true, sdpDescription, peerConnectionParameters.videoStartBitrate, peerConnectionParameters.maxVideoBitrate);
-//            sdpDescription = setVideoBandwidth(sdpDescription, peerConnectionParameters.maxVideoBitrate);
+            sdpDescription =setBitrate(VIDEO_CODEC_VP8, true, sdpDescription, peerConnectionParameters.videoStartBitrate, peerConnectionParameters.maxVideoBitrate);
+            sdpDescription =setBitrate(VIDEO_CODEC_VP9, true, sdpDescription, peerConnectionParameters.videoStartBitrate, peerConnectionParameters.maxVideoBitrate);
+            sdpDescription =setBitrate(VIDEO_CODEC_H264, true, sdpDescription, peerConnectionParameters.videoStartBitrate, peerConnectionParameters.maxVideoBitrate);
+            sdpDescription = setVideoBandwidth(sdpDescription, peerConnectionParameters.maxVideoBitrate);
 //
-//            sdpDescription = setBitrate(peerConnectionParameters.audioCodec, false, sdpDescription, peerConnectionParameters.audioStartBitrate, peerConnectionParameters.maxAudioBitrate);
-
-
+            sdpDescription = setBitrate(peerConnectionParameters.audioCodec, false, sdpDescription, peerConnectionParameters.audioStartBitrate, peerConnectionParameters.maxAudioBitrate);
 
             final SessionDescription sdp = new SessionDescription(
                     origSdp.type, sdpDescription);

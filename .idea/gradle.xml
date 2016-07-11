@@ -13,6 +13,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/utillib" />
             <option value="$PROJECT_DIR$/v50_lib" />
+            <option value="$PROJECT_DIR$/v51_lib" />
           </set>
         </option>
         <option name="myModules">
@@ -21,6 +22,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/utillib" />
             <option value="$PROJECT_DIR$/v50_lib" />
+            <option value="$PROJECT_DIR$/v51_lib" />
           </set>
         </option>
       </GradleProjectSettings>

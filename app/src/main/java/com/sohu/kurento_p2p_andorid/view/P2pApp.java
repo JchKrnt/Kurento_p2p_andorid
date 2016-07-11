@@ -2,6 +2,8 @@ package com.sohu.kurento_p2p_andorid.view;
 
 import android.app.Application;
 import android.content.Intent;
+import android.os.Environment;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.sohu.kurento.util.LogCat;
@@ -14,7 +16,15 @@ import com.sohu.kurento_p2p_andorid.model.bean.BaseP2pSocketResponse;
 import com.sohu.kurento_p2p_andorid.model.bean.UserBean;
 import com.sohu.kurento_p2p_andorid.util.Constants;
 
+import org.apache.log4j.Level;
+
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+
+import de.mindpipe.android.logging.log4j.LogConfigurator;
 
 /**
  * Created by jingbiaowang on 2015/11/10.
@@ -22,6 +32,10 @@ import java.util.ArrayList;
 public class P2pApp extends Application {
 
     private UserBean user;
+
+    public static final String LOG_PATH = Environment.getExternalStorageDirectory() + File.separator+"webrtc"+ File.separator;
+
+
 
     @Override
     public void onCreate() {
@@ -33,6 +47,22 @@ public class P2pApp extends Application {
 
     private void init(){
         SharePrefUtil.initPrefSrc(getApplicationContext(), R.xml.preferences);
+
+        LogConfigurator logConfigurator = new LogConfigurator(P2pApp.class.getName());
+
+        logConfigurator.setRootLevel(Level.DEBUG);
+        logConfigurator.setLevel("webrtc", Level.ERROR);
+        logConfigurator.setFilePattern("%d %-5p [%c{2}]-[%L] %m%n");
+//dd HH:mm:ss
+        DateFormat stf = new SimpleDateFormat("dd_HH_mm_ss_");
+        String formatStr = stf.format(new Date());
+        String fileName = LOG_PATH+ formatStr + "log.txt";
+
+        logConfigurator.setFileName(fileName);
+        logConfigurator.setMaxFileSize(1024 * 1024 * 5);
+        logConfigurator.setImmediateFlush(true);
+        logConfigurator.configure();
+
     }
 
     /**

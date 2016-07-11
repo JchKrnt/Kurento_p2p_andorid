@@ -183,7 +183,6 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
             case R.id.fab: {
                 //                Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
                 //                        .setAction("Action", null).show();
-
                 register();
                 break;
             }
@@ -248,7 +247,6 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                     public void onClick(DialogInterface dialog, int which) {
 
                         gotoPlayActivity(nametv.getText().toString(), name, false);
-
                     }
                 }).setNegativeButton(R.string.reject_call, new DialogInterface.OnClickListener() {
                     @Override

@@ -20,8 +20,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.sohu.kurento.client.apprtc.PeerConnectionClient;
+import com.sohu.kurento.util.LooperExecutor;
 import com.sohu.kurento_p2p_andorid.R;
 
+import org.apache.log4j.Logger;
 import org.webrtc.StatsReport;
 
 import java.util.HashMap;
@@ -42,6 +44,10 @@ public class HudFragment extends Fragment {
   private boolean displayHud;
   private volatile boolean isRunning;
   private final CpuMonitor cpuMonitor = new CpuMonitor();
+
+  private Logger logger;
+
+  private LooperExecutor looperExecutor = null;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,6 +72,10 @@ public class HudFragment extends Fragment {
         }
       }
     });
+
+    logger = Logger.getLogger("webrtc_status");
+    looperExecutor = new LooperExecutor();
+    looperExecutor.requestStart();
 
     return controlView;
   }
@@ -115,11 +125,11 @@ public class HudFragment extends Fragment {
     if (!isRunning || !displayHud) {
       return;
     }
-    StringBuilder encoderStat = new StringBuilder(128);
-    StringBuilder bweStat = new StringBuilder();
+    final StringBuilder encoderStat = new StringBuilder(128);
+    final StringBuilder bweStat = new StringBuilder();
     StringBuilder connectionStat = new StringBuilder();
-    StringBuilder videoSendStat = new StringBuilder();
-    StringBuilder videoRecvStat = new StringBuilder();
+    final StringBuilder videoSendStat = new StringBuilder();
+    final StringBuilder videoRecvStat = new StringBuilder();
     String fps = null;
     String targetBitrate = null;
     String actualBitrate = null;
@@ -198,6 +208,16 @@ public class HudFragment extends Fragment {
           .append(cpuMonitor.getCpuAvg3()).append("/")
           .append(cpuMonitor.getCpuAvgAll());
     }
+
+    looperExecutor.execute(new Runnable() {
+      @Override
+      public void run() {
+        logger.debug(bweStat.toString()+"\n");
+        logger.debug(videoSendStat.toString()+"\n");
+        logger.debug(videoRecvStat.toString()+"\n");
+        logger.debug(encoderStat.toString());
+      }
+    });
     encoderStatView.setText(encoderStat.toString());
   }
 }
