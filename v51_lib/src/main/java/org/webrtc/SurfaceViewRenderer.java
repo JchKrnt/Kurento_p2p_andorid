@@ -276,6 +276,7 @@ public class SurfaceViewRenderer extends SurfaceView
   // VideoRenderer.Callbacks interface.
   @Override
   public void renderFrame(VideoRenderer.I420Frame frame) {
+
     synchronized (statisticsLock) {
       ++framesReceived;
     }

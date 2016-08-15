@@ -639,12 +639,12 @@ public class VideoRendererGui implements GLSurfaceView.Renderer {
       drawThread = Thread.currentThread();
     }
     GLES20.glViewport(0, 0, screenWidth, screenHeight);
-    GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-    synchronized (yuvImageRenderers) {
-      for (YuvImageRenderer yuvImageRenderer : yuvImageRenderers) {
-        yuvImageRenderer.draw();
-      }
+  GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+  synchronized (yuvImageRenderers) {
+    for (YuvImageRenderer yuvImageRenderer : yuvImageRenderers) {
+      yuvImageRenderer.draw();
     }
   }
+}
 
 }

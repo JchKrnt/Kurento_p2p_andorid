@@ -1,1 +1,1 @@
-include ':app', ':utillib', ':v50_lib', 'v51_lib'
+include ':app', ':utillib', ':v50_lib', 'v51_lib', ':GPUImageLib'

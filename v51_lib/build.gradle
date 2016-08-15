@@ -24,4 +24,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile files('libs/autobanh.jar')
     compile 'com.google.code.gson:gson:2.6.2'
+    compile project(':GPUImageLib')
 }

@@ -10,6 +10,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/GPUImageLib" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/utillib" />
             <option value="$PROJECT_DIR$/v50_lib" />
@@ -19,6 +20,7 @@
         <option name="myModules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/GPUImageLib" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/utillib" />
             <option value="$PROJECT_DIR$/v50_lib" />

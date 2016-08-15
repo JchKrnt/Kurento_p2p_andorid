@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="main"><source path="/Users/jch/Documents/workcSpace/android/Kurt_p2p_andorid/GPUImageLib/assets"/><source path="/Users/jch/Documents/workcSpace/android/Kurt_p2p_andorid/GPUImageLib/build/generated/assets/shaders/debug"/></dataSet><dataSet config="debug"><source path="/Users/jch/Documents/workcSpace/android/Kurt_p2p_andorid/GPUImageLib/src/debug/assets"/></dataSet></merger>

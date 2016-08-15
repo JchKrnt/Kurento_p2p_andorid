@@ -15,6 +15,7 @@ import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
+import com.sohu.kurento.GpuImagerRenderer;
 import com.sohu.kurento.util.LogCat;
 import com.sohu.kurento.util.LooperExecutor;
 
@@ -82,6 +83,11 @@ public class PeerConnectionClient {
     private static final String AUDIO_AUTO_GAIN_CONTROL_CONSTRAINT = "googAutoGainControl";
     private static final String AUDIO_HIGH_PASS_FILTER_CONSTRAINT = "googHighpassFilter";
     private static final String AUDIO_NOISE_SUPPRESSION_CONSTRAINT = "googNoiseSuppression";
+    private static final String AUDIO_MiRRORING = "googAudioMirroring";
+    private static final String AUDIO_NOISE_DETECTION = "googTypingNoiseDetection";  //检噪
+    //constraint keys for createOffer / createAnswer defined in W3C specification.
+    private static final String VOICE_ACTIVITY_DETECTION = "VoiceActivityDetection";  //声音检测.
+    private static final String ICE_RESTART = "IceRestart";
     private static final String MAX_VIDEO_WIDTH_CONSTRAINT = "maxWidth";
     private static final String MIN_VIDEO_WIDTH_CONSTRAINT = "minWidth";
     private static final String MAX_VIDEO_HEIGHT_CONSTRAINT = "maxHeight";
@@ -488,16 +494,26 @@ public class PeerConnectionClient {
         if (peerConnectionParameters.noAudioProcessing) {
             Log.d(TAG, "Disabling audio processing");
             audioConstraints.mandatory.add(new KeyValuePair(
-                    AUDIO_ECHO_CANCELLATION_CONSTRAINT, "true"));
+                    AUDIO_ECHO_CANCELLATION_CONSTRAINT, "false"));
             audioConstraints.mandatory.add(new KeyValuePair(
-                    AUDIO_AUTO_GAIN_CONTROL_CONSTRAINT, "true"));
+                    AUDIO_AUTO_GAIN_CONTROL_CONSTRAINT, "false"));
             audioConstraints.mandatory.add(new KeyValuePair(
-                    AUDIO_HIGH_PASS_FILTER_CONSTRAINT, "true"));
+                    AUDIO_HIGH_PASS_FILTER_CONSTRAINT, "false"));
             audioConstraints.mandatory.add(new KeyValuePair(
-                    AUDIO_NOISE_SUPPRESSION_CONSTRAINT, "true"));
+                    AUDIO_NOISE_SUPPRESSION_CONSTRAINT, "false"));
+            audioConstraints.mandatory.add(new KeyValuePair(
+                    AUDIO_NOISE_DETECTION, "false"));
+            audioConstraints.mandatory.add(new KeyValuePair(
+                    AUDIO_MiRRORING, "false"));
         }
         // Create SDP constraints.
         sdpMediaConstraints = new MediaConstraints();
+        sdpMediaConstraints.mandatory.add(new KeyValuePair(
+                ICE_RESTART, "true"
+        ));
+        sdpMediaConstraints.mandatory.add(new KeyValuePair(
+                VOICE_ACTIVITY_DETECTION, "true"
+        ));
         sdpMediaConstraints.mandatory.add(new KeyValuePair(
                 "OfferToReceiveAudio", "true"));
         if (videoCallEnabled || peerConnectionParameters.loopback) {
@@ -828,6 +844,7 @@ public class PeerConnectionClient {
         localVideoTrack = factory.createVideoTrack(VIDEO_TRACK_ID, videoSource);
         localVideoTrack.setEnabled(renderVideo);
         localVideoTrack.addRenderer(new VideoRenderer(localRender));
+        localVideoTrack.addRenderer(new VideoRenderer(new GpuImagerRenderer()));
         return localVideoTrack;
     }
 

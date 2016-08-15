@@ -27,7 +27,7 @@ import org.webrtc.RendererCommon.ScalingType;
 /**
  * Fragment for call control.
  */
-public class PlayFragment extends Fragment {
+public class  PlayFragment extends Fragment {
     private View controlView;
     private TextView contactView;
     private ImageButton disconnectButton;

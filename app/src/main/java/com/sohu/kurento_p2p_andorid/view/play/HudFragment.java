@@ -127,7 +127,7 @@ public class HudFragment extends Fragment {
     }
     final StringBuilder encoderStat = new StringBuilder(128);
     final StringBuilder bweStat = new StringBuilder();
-    StringBuilder connectionStat = new StringBuilder();
+    final StringBuilder connectionStat = new StringBuilder();
     final StringBuilder videoSendStat = new StringBuilder();
     final StringBuilder videoRecvStat = new StringBuilder();
     String fps = null;
@@ -212,10 +212,11 @@ public class HudFragment extends Fragment {
     looperExecutor.execute(new Runnable() {
       @Override
       public void run() {
-        logger.debug(bweStat.toString()+"\n");
-        logger.debug(videoSendStat.toString()+"\n");
-        logger.debug(videoRecvStat.toString()+"\n");
-        logger.debug(encoderStat.toString());
+//        logger.debug(bweStat.toString()+"\n");
+//        logger.debug(videoSendStat.toString()+"\n");
+//        logger.debug(connectionStat.toString());
+//        logger.debug(videoRecvStat.toString()+"\n");
+//        logger.debug(encoderStat.toString());
       }
     });
     encoderStatView.setText(encoderStat.toString());
